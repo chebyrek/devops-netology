@@ -13,4 +13,53 @@ chdir("/tmp")
 /etc/magic
 /usr/share/misc/magic.mgc # линк на /usr/lib/file/magic.mgc
 ```
-**3. **
+**3. Предположим, приложение пишет лог в текстовый файл. Этот файл оказался удален (deleted в lsof), однако возможности сигналом сказать приложению переоткрыть файлы или просто перезапустить приложение – нет. Так как приложение продолжает писать в удаленный файл, место на диске постепенно заканчивается. Основываясь на знаниях о перенаправлении потоков предложите способ обнуления открытого удаленного файла (чтобы освободить место на файловой системе).**  
+
+Как я понял нужно направить "пустоту" в нужный файловый дексриптор процесса, либо использовать `truncate`. И я даже пару ссылок нашел с подтверждением моих мыслей [1](https://serverfault.com/questions/501963/how-do-i-recover-free-space-on-deleted-files-without-restarting-the-referencing) , [2](https://unix.stackexchange.com/questions/146929/how-can-a-log-program-continue-to-log-to-a-deleted-file). 
+```
+$ > /proc/PID/fd/1
+$ > truncate -s 0 /proc/PID/fd/1
+```
+Только вот у меня так и не получилось это сделать, подскажите, что я делаю не так.
+```
+# заполняю в бесконечном цикле файл (/dev/urandom слишком быстро забивал диск, я не успевал поэкспериментировать)
+# перенаправляю получившийся файл в другой, с помощью tail
+# файл полученый после tail удаляю
+
+$ while [ 1 = 1 ]; do echo "a" >> ffff; done &
+[1] 3056
+$ tail -f ffff > testfile &
+[2] 3058
+$ lsof | grep testfile
+tail      3058                            user    1w      REG              253,0  3361624     407500 /home/user/testfile
+$ rm testfile
+$ lsof | grep testfile
+tail      3058                            user    1w      REG              253,0  7630724     407500 /home/user/testfile (deleted)
+$ ls -lh /proc/3058/fd
+total 0
+lrwx------ 1 user user 64 Apr 21 08:09 0 -> /dev/pts/0
+l-wx------ 1 user user 64 Apr 21 08:09 1 -> '/home/user/testfile (deleted)'
+lrwx------ 1 user user 64 Apr 21 08:09 2 -> /dev/pts/0
+lr-x------ 1 user user 64 Apr 21 08:09 3 -> /home/user/ffff
+lr-x------ 1 user user 64 Apr 21 08:09 4 -> anon_inode:inotify
+$ > /proc/3058/fd/1 # очищаю файл
+user@testubuntu:~$ lsof | grep testfile
+tail      3058                            user    1w      REG              253,0 22045724     407500 /home/user/testfile (deleted) # файл не уменьшается в размере
+$ lsof | grep testfile
+tail      3058                            user    1w      REG              253,0  30080918     407500 /home/user/testfile (deleted) # и продолжает увеличиваться
+```
+В слак не стал эту простыню тащить.  
+
+**4. Занимают ли зомби-процессы какие-то ресурсы в ОС (CPU, RAM, IO)?**  
+Нет, так этот процесс уже завершен
+
+**5. В iovisor BCC есть утилита opensnoop. На какие файлы вы увидели вызовы группы open за первую секунду работы утилиты? Воспользуйтесь пакетом bpfcc-tools для Ubuntu 20.04.**   
+первая запись появилась секунд через 10.
+```
+$ sudo opensnoop-bpfcc
+PID    COMM               FD ERR PATH
+1      systemd            12   0 /proc/734/cgroup
+```
+**6. Какой системный вызов использует uname -a? Приведите цитату из man по этому системному вызову, где описывается альтернативное местоположение в /proc, где можно узнать версию ядра и релиз ОС.**  
+
+
