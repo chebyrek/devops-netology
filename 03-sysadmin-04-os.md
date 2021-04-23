@@ -39,6 +39,24 @@ ExecStart=/usr/bin/node_exporter $OPTIONS
 WantedBy=multi-user.target
 ```
 
-**2.Ознакомьтесь с опциями node_exporter и выводом /metrics по-умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.**  
+**2. Ознакомьтесь с опциями node_exporter и выводом /metrics по-умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.**  
 
-collector.cpu.info, 
+collector.cpu.info, collector.cpu, collector.cpufreq, collector.diskstats, collector.filesystem, collector.loadavg, collector.meminfo, collector.netdev, collector.netstat, collector.uname  
+
+**4. Можно ли по выводу dmesg понять, осознает ли ОС, что загружена не на настоящем оборудовании, а на системе виртуализации?**  
+
+Да, можно
+```
+# на Hyper-v, например такие строки в dmesg
+[    0.000000] DMI: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS 090007  05/18/2018
+[    0.000000] Hypervisor detected: Microsoft Hyper-V
+[    0.000000] Hyper-V: features 0x2e7f, hints 0x60e24, misc 0xbed7b2
+[    0.000000] Hyper-V Host Build:17763-10.0-0-0.737
+[    0.000000] Hyper-V: LAPIC Timer Frequency: 0xc3500
+[    0.000000] tsc: Marking TSC unstable due to running on Hyper-V
+[    0.000000] Hyper-V: Using hypercall for remote TLB flush
+```
+```
+# а на VirtualBox такие
+
+```
