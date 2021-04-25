@@ -50,13 +50,42 @@ collector.cpu.info, collector.cpu, collector.cpufreq, collector.diskstats, colle
 # на Hyper-v, например такие строки в dmesg
 [    0.000000] DMI: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS 090007  05/18/2018
 [    0.000000] Hypervisor detected: Microsoft Hyper-V
-[    0.000000] Hyper-V: features 0x2e7f, hints 0x60e24, misc 0xbed7b2
-[    0.000000] Hyper-V Host Build:17763-10.0-0-0.737
-[    0.000000] Hyper-V: LAPIC Timer Frequency: 0xc3500
-[    0.000000] tsc: Marking TSC unstable due to running on Hyper-V
-[    0.000000] Hyper-V: Using hypercall for remote TLB flush
 ```
 ```
 # а на VirtualBox такие
-
+[    0.000000] DMI: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
+[    0.000000] Hypervisor detected: KVM
 ```
+
+**5. Как настроен `sysctl fs.nr_open` на системе по-умолчанию? Узнайте, что означает этот параметр. Какой другой существующий лимит не позволит достичь такого числа (`ulimit --help`)?**  
+```
+$ sysctl fs.nr_open
+fs.nr_open = 1048576
+```
+Задает максимальное количество открытых файлов для процесса  
+```
+$ ulimit -n
+1024
+```
+
+**6. Запустите любой долгоживущий процесс (не `ls`, который отработает мгновенно, а, например, `sleep 1h`) в отдельном неймспейсе процессов; покажите, что ваш процесс работает под PID 1 через `nsenter`. Для простоты работайте в данном задании под root (`sudo -i`).**  
+```
+# screen
+# unshare -f --pid --mount-proc /bin/sleep 1h
+C-a c
+# nsenter --target 1220 --pid --mount
+# ps aux
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.0   8076   528 pts/1    S+   08:05   0:00 /bin/sleep 1h
+root           2  0.0  0.1   9836  4232 pts/2    S    08:07   0:00 -bash
+root          11  0.0  0.0  11492  3380 pts/2    R+   08:07   0:00 ps aux
+```
+**7. Найдите информацию о том, что такое `:(){ :|:& };:`. Запустите эту команду в своей виртуальной машине Vagrant с Ubuntu 20.04 (это важно, поведение в других ОС не проверялось). Некоторое время все будет "плохо", после чего (минуты) – ОС должна стабилизироваться. Вызов `dmesg` расскажет, какой механизм помог автоматической стабилизации. Как настроен этот механизм по-умолчанию, и как изменить число процессов, которое можно создать в сессии?**  
+
+`:(){ :|:& };:` - это "fork bomb", функция множество раз вызывающая саму себя
+
+Механизм cgroup pids controller
+```
+ cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-5.scope
+```
+Из
