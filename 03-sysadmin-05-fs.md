@@ -150,7 +150,7 @@ $ echo $?
 $ sudo pvmove /dev/md1 /dev/md0
   /dev/md1: Moved: 8.00%
   /dev/md1: Moved: 100.00%
-vagrant@vagrant:~$ lsblk
+$ lsblk
 NAME                 MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
 sda                    8:0    0   64G  0 disk
 ├─sda1                 8:1    0  512M  0 part  /boot/efi
