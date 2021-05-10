@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
     node.vm.provision "shell" do |s|
       s.inline = "hostname client;"\
       "ip addr add 192.168.10.250/24 dev eth1;"\
-      "ip link set dev eth1 up;"\
+      "ip link set dev eth1 up;"
     end
   end
 
