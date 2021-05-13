@@ -13,4 +13,7 @@ vagrant@vagrant:~$ vault server -dev -dev-listen-address="0.0.0.0:8200"
          Cluster Address: https://0.0.0.0:8201
 ...
 ```
-**3. **  
+**3. Используя PKI Secrets Engine, создайте Root CA и Intermediate CA.**  
+```
+
+```
