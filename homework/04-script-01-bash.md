@@ -87,10 +87,9 @@ done
 ```bash
 > cat .\.git\hooks\commit-msg
 #!C:/Program\ Files/Git/bin/sh.exe
-task='[04-script-01-bash]'
 message=$(cat $1)
-if [[ "${#message}" -ge "30" ||  "$message" != "$task"* ]]; then
-  echo "The message must contain the code of the current task and be no longer than 30 characters"
+if [[ "${#message}" -ge "30" || "$message" != "["?*"] "* ]]; then
+  echo "The message must contain the code of the current task in [] and be no longer than 30 characters"
   exit 1
 fi
 ```
