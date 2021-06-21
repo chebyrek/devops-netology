@@ -50,7 +50,7 @@
 
 https://hub.docker.com/repository/docker/chebyrek/docker-test  
 
-**3. **
+**3. Подключитесь во второй контейнер и отобразите листинг и содержание файлов в /info контейнера.**  
 
 ```bash
 $ sudo docker pull centos
