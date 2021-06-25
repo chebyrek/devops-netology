@@ -44,3 +44,5 @@ CMD ["/usr/bin/java","-jar","/usr/share/jenkins/jenkins.war"]
 
 
 https://hub.docker.com/repository/docker/chebyrek/05_virt_04_t2
+
+**3. Задача 3**  
