@@ -7,7 +7,7 @@ RUN pacman --noconfirm -Syu ponysay
 ENTRYPOINT ["/usr/bin/ponysay"]
 CMD ["Hey, netology”]
 ```
-![Docker run result](/homework/img/05-virt-04-t1.jpg)
+<img src="/homework/img/05-virt-04-t1.jpg" width=30%> 
 
 https://hub.docker.com/repository/docker/chebyrek/05_virt_04_t1
 
@@ -25,4 +25,10 @@ RUN apt-get update &&\
 EXPOSE 8080
 CMD ["/usr/bin/java","-jar","/usr/share/jenkins/jenkins.war"]
 ```
-![ver2 logs](/homework/img/05_virt_04_t2_ubnt_log.jpg)
+
+1|2
+-----------------------|--------------------------------
+<img src="/homework/img/05_virt_04_t2_ubnt_jen.jpg" width=100%> | <img src="/homework/img/05_virt_04_t2_ubnt_log.jpg" width=100%>  
+
+
+https://hub.docker.com/repository/docker/chebyrek/05_virt_04_t2
