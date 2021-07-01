@@ -46,3 +46,13 @@ CMD ["/usr/bin/java","-jar","/usr/share/jenkins/jenkins.war"]
 https://hub.docker.com/repository/docker/chebyrek/05_virt_04_t2
 
 **3. Задача 3**  
+```Dockerfile
+FROM node
+WORKDIR /opt/nodejs-demo
+COPY nodejs-demo-master /opt/nodejs-demo/
+EXPOSE 3000
+RUN npm install
+CMD ["npm","start", "0.0.0.0", "3000"]
+```
+<img src="/homework/img/05_virt_04_t3_curl.jpg" width=100%>
+<img src="/homework/img/05_virt_04_t3_network.jpg" width=100%>
