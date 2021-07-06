@@ -77,3 +77,37 @@ olicies
  public | orders_id_seq  | sequence |                                    |                   | 
 (4 rows)
 ```
+
+**Задание 3*  
+```sql
+insert into orders (Наименование, Цена)
+values ('Шоколад', 10),
+        ('Принтер', 3000),
+        ('Книга', 500),
+        ('Монитор', 7000),
+        ('Гитара', 4000);
+
+insert into clients (Фамилия, "Страна проживания")
+values ('Иванов Иван Иванович', 'USA'),
+        ('Петров Петр Петрович', 'Canada'),
+        ('Иоганн Себастьян Бах', 'Japan'),
+        ('Ронни Джеймс Дио', 'Russia'),
+        ('Ritchie Blackmore', 'Russia');
+```
+```sql
+select  (
+    select count(*)
+    from  orders
+    ) as orders_row_count,
+    (
+    select count(*)
+    from  clients
+    ) as clients_row_count
+```
+1 row returned
+
+-|orders_row_count</br>bigint|clients_row_count</br>bigint
+-|---------------|-----------------
+1|5|5
+
+
