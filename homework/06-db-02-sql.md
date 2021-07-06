@@ -1,4 +1,4 @@
-**Задание 1**  
+**Задача 1**  
 ```yml
 version: "3"
 services:
@@ -14,7 +14,7 @@ volumes:
   psbk:
 ```  
 
-**Задание 2**  
+**Задача 2**  
 ```
 test_db=# \dt
           List of relations
@@ -78,7 +78,7 @@ olicies
 (4 rows)
 ```
 
-**Задание 3*  
+**Задача 3*  
 ```sql
 insert into orders (Наименование, Цена)
 values ('Шоколад', 10),
@@ -110,4 +110,28 @@ select  (
 -|---------------|-----------------
 1|5|5
 
+**Задача 4**  
+```sql
+update clients
+set Заказ = (select id from orders where Наименование = 'Книга')
+where Фамилия = 'Иванов Иван Иванович';
 
+update clients
+set Заказ = (select id from orders where Наименование = 'Монитор')
+where Фамилия = 'Петров Петр Петрович';
+
+update clients
+set Заказ = (select id from orders where Наименование = 'Гитара')
+where Фамилия = 'Иоганн Себастьян Бах';
+```
+```sql
+select Фамилия 
+from clients
+where Заказ is not NULL;
+```
+	
+-|Фамилия</br>character varying
+-|-
+1|Иванов Иван Иванович
+2|Петров Петр Петрович
+3|Иоганн Себастьян Бах
