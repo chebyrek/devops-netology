@@ -229,11 +229,29 @@ Seq Scan on clients  (cost=0.00..18.10 rows=806 width=32)
 ## Задача 6
 
 Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. Задачу 1).
-
+```shell
+pg_dump -U postgres test_db > /backup/test_db.sql # бэкап
+```
 Остановите контейнер с PostgreSQL (но не удаляйте volumes).
-
 Поднимите новый пустой контейнер с PostgreSQL.
-
+```shell
+docker run -e POSTGRES_PASSWORD=mysecretpassword --mount source=06-db-02-sql_psbk,target=/backup -d postgres:12
+```
 Восстановите БД test_db в новом контейнере.
 
+
+```sql
+--Создаю пустую базу и пользователей
+create database test_db;
+create user "test-admin-user" WITH PASSWORD '1';
+create user "test-simple-user" WITH PASSWORD '2';
+```
+```shell
+psql -U postgres -d test_db < /backup/test_db.sql # восстановление
+```
 Приведите список операций, который вы применяли для бэкапа данных и восстановления. 
+
+
+
+
+
