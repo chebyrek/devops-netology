@@ -66,7 +66,9 @@ select * from INFORMATION_SCHEMA.USER_ATTRIBUTES where user = 'test';
 Изучите вывод профилирования команд `SHOW PROFILES;`.
 
 Исследуйте, какой `engine` используется в таблице БД `test_db` и **приведите в ответе**.  
-В таблице orders используется движок innoDB    
+
+`В таблице orders используется движок innoDB`    
+
 Измените `engine` и **приведите время выполнения и запрос на изменения из профайлера в ответе**:
 - на `MyISAM`
 - на `InnoDB`
@@ -92,7 +94,24 @@ show profiles;
 - Размер файла логов операций 100 Мб
 
 Приведите в ответе измененный файл `my.cnf`.
+```
+[mysqld]
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+datadir         = /var/lib/mysql
+secure-file-priv= NULL
 
+innodb_buffer_pool_size=615M
+innodb_log_file_size=100M
+innodb_log_buffer_size=1M 
+innodb_flush_method=O_DSYNC 
+innodb_flush_log_at_trx_commit=2 
+innodb_file_per_table=1 
+
+# Custom config should go here
+!includedir /etc/mysql/conf.d/
+
+```
 ---
 
 ### Как оформить ДЗ?
