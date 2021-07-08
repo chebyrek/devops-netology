@@ -44,18 +44,42 @@ select count(*) from orders where price > 300;
     
 Используя таблицу INFORMATION_SCHEMA.USER_ATTRIBUTES получите данные по пользователю `test` и 
 **приведите в ответе к задаче**.
+```sql
+create user 'test'@'localhost' 
+    identified with mysql_native_password by 'test-pass' 
+    WITH MAX_QUERIES_PER_HOUR 100 
+    PASSWORD EXPIRE INTERVAL 180 DAY 
+    FAILED_LOGIN_ATTEMPTS 3 
+    ATTRIBUTE '{"FirstName": "Pretty", "Name": "James"}'
 
+select * from INFORMATION_SCHEMA.USER_ATTRIBUTES where user = 'test';
++------+-----------+------------------------------------------+
+| USER | HOST      | ATTRIBUTE                                |
++------+-----------+------------------------------------------+
+| test | localhost | {"Name": "James", "FirstName": "Pretty"} |
++------+-----------+------------------------------------------+
+1 row in set (0.00 sec)
+```
 ## Задача 3
 
 Установите профилирование `SET profiling = 1`.
 Изучите вывод профилирования команд `SHOW PROFILES;`.
 
-Исследуйте, какой `engine` используется в таблице БД `test_db` и **приведите в ответе**.
-
+Исследуйте, какой `engine` используется в таблице БД `test_db` и **приведите в ответе**.  
+В таблице orders используется движок innoDB    
 Измените `engine` и **приведите время выполнения и запрос на изменения из профайлера в ответе**:
 - на `MyISAM`
 - на `InnoDB`
-
+```sql
+show profiles;
++----------+------------+----------------------------------+
+| Query_ID | Duration   | Query                            |
++----------+------------+----------------------------------+
+|        6 | 0.01912125 | alter table orders engine=myisam |
+|        7 | 0.02104325 | alter table orders engine=innodb |
++----------+------------+----------------------------------+
+7 rows in set, 1 warning (0.00 sec)
+```
 ## Задача 4 
 
 Изучите файл `my.cnf` в директории /etc/mysql.
