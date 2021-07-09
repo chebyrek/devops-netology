@@ -59,8 +59,43 @@ where tablename='orders'
 провести разбиение таблицы на 2 (шардировать на orders_1 - price>499 и orders_2 - price<=499).
 
 Предложите SQL-транзакцию для проведения данной операции.
+```sql
+begin;
 
-Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
+CREATE TABLE public.new_orders (
+    id integer NOT NULL,
+    title character varying(80) NOT NULL,
+    price integer DEFAULT 0
+);
+
+create table orders_1 (
+    check (price > 499)
+) inherits (new_orders);
+
+create table orders_2 (
+    check (price <= 499)
+) inherits (new_orders);
+
+INSERT INTO orders_1 (id,title,price)
+SELECT id,title,price
+from orders
+where price > 499;
+
+INSERT INTO orders_2 (id,title,price)
+SELECT id,title,price
+from orders
+where price <= 499;
+
+ALTER TABLE orders RENAME TO orders_bk;
+ALTER TABLE new_orders RENAME TO orders;
+
+drop table orders_bk;
+
+commit;
+```
+Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?  
+
+Можно, нужно использовать условие `PARTITION BY` при создании основной таблицы, после создать дополнительные таблицы, используя `PARTITION OF`
 
 ## Задача 4
 
