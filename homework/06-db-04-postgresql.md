@@ -103,6 +103,14 @@ commit;
 
 Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?
 
+Добавить к параметрам столбца `UNIQUE`
+```sql
+CREATE TABLE public.orders (
+    id integer NOT NULL,
+    title character varying(80) NOT NULL UNIQUE,
+    price integer DEFAULT 0
+);
+```
 ---
 
 ### Как оформить ДЗ?
