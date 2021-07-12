@@ -89,6 +89,18 @@ where price <= 499;
 ALTER TABLE orders RENAME TO orders_bk;
 ALTER TABLE new_orders RENAME TO orders;
 
+create rule orders_insert_to_1 
+as on insert to orders 
+where (price > 499) 
+do instead 
+      insert into orders_1 values(new.*);
+      
+create rule orders_insert_to_2 
+as on insert to orders 
+where (price <= 499) 
+do instead 
+      insert into orders_2 values(new.*);
+      
 drop table orders_bk;
 
 commit;
