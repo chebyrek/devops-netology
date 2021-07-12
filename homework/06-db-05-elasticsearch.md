@@ -79,13 +79,60 @@ $ curl localhost:9200/
 | ind-3 | 2 | 4 |
 
 Получите список индексов и их статусов, используя API и **приведите в ответе** на задание.
-
+```sh
+$ curl -X GET "localhost:9200/_cat/indices"
+green  open ind-1 afYKSk4RTQ-T_7jrxTbUDQ 1 0 0 0 208b 208b
+yellow open ind-3 trn3ZX7OTNmLjHeVSVRzvA 4 2 0 0 832b 832b
+yellow open ind-2 qUsmMdlfTqSUmU55YmufBw 2 1 0 0 416b 416b
+```
 Получите состояние кластера `elasticsearch`, используя API.
+```json
+$ curl -X GET "localhost:9200/_cluster/health?pretty"
+{
+   "cluster_name":"elasticsearch",
+   "status":"yellow",
+   "timed_out":false,
+   "number_of_nodes":1,
+   "number_of_data_nodes":1,
+   "active_primary_shards":7,
+   "active_shards":7,
+   "relocating_shards":0,
+   "initializing_shards":0,
+   "unassigned_shards":10,
+   "delayed_unassigned_shards":0,
+   "number_of_pending_tasks":0,
+   "number_of_in_flight_fetch":0,
+   "task_max_waiting_in_queue_millis":0,
+   "active_shards_percent_as_number":41.17647058823529
+}
+```
+Как вы думаете, почему часть индексов и кластер находится в состоянии yellow?  
 
-Как вы думаете, почему часть индексов и кластер находится в состоянии yellow?
-
+*Потому что часть шардов находится в состоянии UNASSIGNED. Необходимо привязать их к ноде, чтобы статус изменился. У индекса `ind-1` состояние `green`, потому что у него всего один шард.*
+```
+$ curl -X GET "localhost:9200/_cat/shards"
+ind-3 1 p STARTED    0 208b 172.17.0.2 netology_test
+ind-3 1 r UNASSIGNED                   
+ind-3 1 r UNASSIGNED                   
+ind-3 3 p STARTED    0 208b 172.17.0.2 netology_test
+ind-3 3 r UNASSIGNED                   
+ind-3 3 r UNASSIGNED                   
+ind-3 2 p STARTED    0 208b 172.17.0.2 netology_test
+ind-3 2 r UNASSIGNED                   
+ind-3 2 r UNASSIGNED                   
+ind-3 0 p STARTED    0 208b 172.17.0.2 netology_test
+ind-3 0 r UNASSIGNED                   
+ind-3 0 r UNASSIGNED                   
+ind-1 0 p STARTED    0 208b 172.17.0.2 netology_test
+ind-2 1 p STARTED    0 208b 172.17.0.2 netology_test
+ind-2 1 r UNASSIGNED                   
+ind-2 0 p STARTED    0 208b 172.17.0.2 netology_test
+ind-2 0 r UNASSIGNED              
+```
 Удалите все индексы.
-
+```sh
+curl -X DELETE "localhost:9200/ind-{1,2,3}"
+```
 **Важно**
 
 При проектировании кластера elasticsearch нужно корректно рассчитывать количество реплик и шард,
@@ -103,21 +150,55 @@ $ curl localhost:9200/
 данную директорию как `snapshot repository` c именем `netology_backup`.
 
 **Приведите в ответе** запрос API и результат вызова API для создания репозитория.
-
+```sh
+$ curl -X PUT "localhost:9200/_snapshot/netology_backup?pretty" -H 'Content-Type: application/json' -d'
+{
+  "type": "fs",
+  "settings": {
+    "location": "/opt/elasticsearch/snapshots"
+  }
+}
+'
+{
+  "acknowledged" : true
+}
+```
 Создайте индекс `test` с 0 реплик и 1 шардом и **приведите в ответе** список индексов.
-
+```sh
+$ curl -X GET "localhost:9200/_cat/indices"
+green open test X5XF8OgrSv-dGyq2S1yzNA 1 0 0 0 208b 208b
+```
 [Создайте `snapshot`](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-take-snapshot.html) 
 состояния кластера `elasticsearch`.
 
 **Приведите в ответе** список файлов в директории со `snapshot`ами.
-
+```sh
+ls -l snapshots/
+total 44
+-rw-r--r-- 1 elasticsearch elasticsearch   505 Jul 12 15:07 index-0
+-rw-r--r-- 1 elasticsearch elasticsearch     8 Jul 12 15:07 index.latest
+drwxr-xr-x 3 elasticsearch elasticsearch  4096 Jul 12 15:06 indices
+-rw-r--r-- 1 elasticsearch elasticsearch 25649 Jul 12 15:07 meta-JlP8a1irSnGWdAY3lmAvzQ.dat
+-rw-r--r-- 1 elasticsearch elasticsearch   360 Jul 12 15:07 snap-JlP8a1irSnGWdAY3lmAvzQ.dat
+```
 Удалите индекс `test` и создайте индекс `test-2`. **Приведите в ответе** список индексов.
-
+```sh
+$ curl -X GET "localhost:9200/_cat/indices"
+green open test-2 GKWPqxiFR2O8AHLYlXyo6Q 1 0 0 0 208b 208b
+```
 [Восстановите](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-restore-snapshot.html) состояние
 кластера `elasticsearch` из `snapshot`, созданного ранее. 
 
 **Приведите в ответе** запрос к API восстановления и итоговый список индексов.
-
+```sh
+$ curl -X POST "localhost:9200/_snapshot/netology_backup/snapshot_1/_restore?pretty"
+{
+  "accepted" : true
+}
+$ curl -X GET "localhost:9200/_cat/indices"
+green open test-2 GKWPqxiFR2O8AHLYlXyo6Q 1 0 0 0 208b 208b
+green open test  v3jPXb-GRQqbXe1arrFkdg 1 0 0 0 208b 208b
+```
 Подсказки:
 - возможно вам понадобится доработать `elasticsearch.yml` в части директивы `path.repo` и перезапустить `elasticsearch`
 
