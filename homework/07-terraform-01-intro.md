@@ -64,6 +64,18 @@ on linux_amd64
 В виде результата этой задачи приложите вывод `--version` двух версий терраформа доступных на вашем компьютере 
 или виртуальной машине.
 
+```sh
+$ terraform0155 --version
+Terraform v0.15.5
+on linux_amd64
+
+Your version of Terraform is out of date! The latest version
+is 1.0.3. You can update by downloading from https://www.terraform.io/downloads.html
+
+$ terraform --version
+Terraform v1.0.3
+on linux_amd64
+```
 ---
 
 ### Как оформить ДЗ?
