@@ -93,4 +93,36 @@ workflows:
 Создайте аналогичный инстанс при помощи найденного модуля.   
 
 В качестве результата задания приложите ссылку на созданный блок конфигураций. 
+```terraform
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+  }
+}
 
+provider "aws" {
+  region = "us-west-2"
+}
+
+module "ec2-instance" {
+  source                 = "terraform-aws-modules/ec2-instance/aws"
+  version                = "~> 2.0"
+
+  name                   = "netology_test"
+  instance_count         = 1
+
+  ami                    = "ami-03d5c68bab01f3496"
+  instance_type          = "t2.micro"
+  key_name               = "test_key_pair"
+  monitoring             = false
+  subnet_id              = "subnet-8760fdff"
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+    Name = "Netology_test"
+  }
+}
+```
