@@ -31,7 +31,32 @@
 1. Необходимо включить автопланирование при изменении любых файлов `*.tf`.
 
 В качестве результата приложите ссылку на файлы `server.yaml` и `atlantis.yaml`.
-
+```yaml
+#server.yaml
+repos:
+- id: /github.com//chebyrek/*/
+  branch: /.*/
+  apply_requirements: [approved, mergeable]
+  workflow: custom
+  allowed_overrides: [workflow]
+  allowed_workflows: [custom]
+  allow_custom_workflows: true
+  delete_source_branch_on_merge: true
+  
+workflows:
+  custom:
+    plan:
+      steps:
+      - run: my-custom-command arg1 arg2
+      - init
+      - plan:
+          extra_args: ["-lock=false"]
+      - run: ./script.sh
+    apply:
+      steps:
+      - run: echo hi
+      - apply
+```
 ## Задача 3. Знакомство с каталогом модулей. 
 
 1. В [каталоге модулей](https://registry.terraform.io/browse/modules) найдите официальный модуль от aws для создания
