@@ -47,16 +47,42 @@ workflows:
   custom:
     plan:
       steps:
-      - run: my-custom-command arg1 arg2
       - init
       - plan:
           extra_args: ["-lock=false"]
-      - run: ./script.sh
     apply:
       steps:
-      - run: echo hi
       - apply
 ```
+```yaml
+#atlantis.yaml
+version: 3
+automerge: true
+delete_source_branch_on_merge: true
+projects:
+- name: netology
+  dir: .
+  workspace: prod
+  dir: .
+  workspace: stage
+  terraform_version: v1.0.4
+  delete_source_branch_on_merge: true
+  autoplan:
+    when_modified: "*.tf"
+    enabled: true
+  apply_requirements: [mergeable, approved]
+  workflow: myworkflow
+workflows:
+  myworkflow:
+    plan:
+      steps:
+      - init
+      - plan
+    apply:
+      steps:
+      - apply
+```
+
 ## Задача 3. Знакомство с каталогом модулей. 
 
 1. В [каталоге модулей](https://registry.terraform.io/browse/modules) найдите официальный модуль от aws для создания
