@@ -37,3 +37,98 @@
 Ответ:  
 В формуле забыли про 3хх коды ответов, корректная формула выглядит так:  
 (summ_2xx_requests + summ_3xx_requests)/(summ_all_requests)  
+
+## Дополнительное задание (со звездочкой*) - необязательно к выполнению
+
+Вы устроились на работу в стартап. На данный момент у вас нет возможности развернуть полноценную систему 
+мониторинга, и вы решили самостоятельно написать простой python3-скрипт для сбора основных метрик сервера. Вы, как 
+опытный системный-администратор, знаете, что системная информация сервера лежит в директории `/proc`. 
+Также, вы знаете, что в системе Linux есть  планировщик задач cron, который может запускать задачи по расписанию.
+
+Суммировав все, вы спроектировали приложение, которое:
+- является python3 скриптом
+- собирает метрики из папки `/proc`
+- складывает метрики в файл 'YY-MM-DD-awesome-monitoring.log' в директорию /var/log 
+(YY - год, MM - месяц, DD - день)
+- каждый сбор метрик складывается в виде json-строки, в виде:
+  + timestamp (временная метка, int, unixtimestamp)
+  + metric_1 (метрика 1)
+  + metric_2 (метрика 2)
+  
+     ...
+     
+  + metric_N (метрика N)
+  
+- сбор метрик происходит каждую 1 минуту по cron-расписанию
+
+Для успешного выполнения задания нужно привести:
+
+а) работающий код python3-скрипта,
+```python
+from pathlib import Path
+import time
+import datetime
+import json
+
+metrics = {'cpu1': Path('/proc') / 'loadavg',
+            'cpu5': Path('/proc') / 'loadavg',
+            'memFree': Path('/proc') / 'meminfo',
+            'uptime': Path('/proc') / 'uptime'} 
+
+def set_file_name():
+    name = "-awesome-monitoring.log"
+    date = datetime.datetime.today()
+    return date.strftime("%y-%m-%d") + name
+
+def get_metric(metric_name):
+    metric = ''
+    with open(metrics[metric_name], 'r') as file:
+        content = file.read()
+    if metric_name == 'cpu1':
+        metric = content.split()[0]
+    if metric_name == 'cpu5':
+        metric = content.split()[1]
+    if metric_name == 'memFree':
+        for line in content.split('\n'):
+            if line.startswith('MemTotal'):
+                mem_total = int(line.split()[1])
+            if line.startswith('MemAvailable'):
+                mem_free = int(line.split()[1])
+        metric = round(mem_free * 100 / mem_total)
+    if metric_name == 'uptime':
+        uptime = round(float(content.split()[0]))
+        metric = str(datetime.timedelta(seconds=uptime))
+    return metric
+
+def main():
+    result = {'timestamp':int(time.time())}
+
+    for k in metrics.keys():
+        metric = get_metric(k)
+        result[k] = metric
+        
+    log_file = Path("/var/log") / set_file_name()
+
+    with open(log_file,'a') as file:
+        file.write(json.dumps(result))
+
+if __name__ == "__main__":
+    main()
+```
+
+б) конфигурацию cron-расписания,
+```sh
+$ sudo crontab -e
+* * * * * python3 /home/user/proc_monitor/proc_monitor.py 2&1>/dev/null
+```
+в) пример верно сформированного 'YY-MM-DD-awesome-monitoring.log', имеющий не менее 5 записей,
+```json
+{"timestamp": 1634967121, "cpu1": "0.02", "cpu5": "0.05", "memFree": 66, "uptime": "18 days, 21:15:46"}
+{"timestamp": 1634967181, "cpu1": "0.00", "cpu5": "0.04", "memFree": 66, "uptime": "18 days, 21:16:46"}
+{"timestamp": 1634967241, "cpu1": "0.07", "cpu5": "0.06", "memFree": 66, "uptime": "18 days, 21:17:46"}
+{"timestamp": 1634967301, "cpu1": "0.02", "cpu5": "0.04", "memFree": 66, "uptime": "18 days, 21:18:46"}
+{"timestamp": 1634967361, "cpu1": "0.01", "cpu5": "0.03", "memFree": 66, "uptime": "18 days, 21:19:46"}
+{"timestamp": 1634967421, "cpu1": "0.07", "cpu5": "0.04", "memFree": 66, "uptime": "18 days, 21:20:46"}
+```
+P.S.: количество собираемых метрик должно быть не менее 4-х.
+P.P.S.: по желанию можно себя не ограничивать только сбором метрик из `/proc`.
