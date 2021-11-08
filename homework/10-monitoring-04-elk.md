@@ -26,9 +26,13 @@ Filebeat следует сконфигурировать для отправки
 
 
 ## Задание 2
-
-### Я не осилил подключить filebeat к logstash, он отказывается слать туда логи, пинг идет, а подключаться на порт 5046 к logstash не хочет, настроил filebeat отправлять данные сразу в elastic
-
+---
+Я не осилил настроить logstash, настроил filebeat отправлять данные сразу в elastic.
+На filebeat такая ошибка, хз что делать
+```
+Failed to publish events caused by: read tcp 192.168.192.6:37924->192.168.192.4:5046: i/o timeout"
+```
+---
 Перейдите в меню [создания index-patterns  в kibana](http://localhost:5601/app/management/kibana/indexPatterns/create)
 и создайте несколько index-patterns из имеющихся.
 
