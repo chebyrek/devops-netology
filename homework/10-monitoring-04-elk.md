@@ -28,7 +28,7 @@ Filebeat следует сконфигурировать для отправки
 ## Задание 2
 ---
 Я не осилил настроить logstash, настроил filebeat отправлять данные сразу в elastic.
-На filebeat такая ошибка, хз что делать
+В логах filebeat такие ошибки:
 ```
 {"level":"error","timestamp":"2021-11-08T09:21:22.067Z","caller":"logstash/async.go:256","message":"Failed to publish events caused by: read tcp 172.20.0.6:34886->172.20.0.5:5046: i/o timeout"}
 {"level":"error","timestamp":"2021-11-08T09:21:22.068Z","caller":"logstash/async.go:256","message":"Failed to publish events caused by: client is not connected"}
@@ -38,7 +38,7 @@ Filebeat следует сконфигурировать для отправки
 {"level":"info","timestamp":"2021-11-08T09:21:23.152Z","logger":"publisher","caller":"pipeline/retry.go:189","message":"retryer: send unwait-signal to consumer"}
 {"level":"info","timestamp":"2021-11-08T09:21:23.152Z","logger":"publisher","caller":"pipeline/retry.go:191","message":"  done"}
 ```
-При этом в логах контейнера logstash видно, что что-то приходит
+При этом в логах контейнера logstash видно, что он принимает сообшения от filebeat, но индекс не создает.
 ```
 {
           "port" => 34936,
@@ -70,7 +70,6 @@ Filebeat следует сконфигурировать для отправки
     ],
     "@timestamp" => 2021-11-08T09:22:58.288Z
 ```
-Но никаких индексов не создается в любом случае.
 
 ---
 Перейдите в меню [создания index-patterns  в kibana](http://localhost:5601/app/management/kibana/indexPatterns/create)
