@@ -44,18 +44,10 @@ storage-provisioner              1/1     Running   1 (26s ago)    72s
 
 - развернуть через Minikube тестовое приложение по [туториалу](https://kubernetes.io/ru/docs/tutorials/hello-minikube/#%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BA%D0%BB%D0%B0%D1%81%D1%82%D0%B5%D1%80%D0%B0-minikube)
 ```
-root@devkub:~# kubectl get pod,svc -n kube-system
-NAME                                 READY   STATUS    RESTARTS      AGE
-pod/coredns-78fcd69978-xbjg2         1/1     Running   0             19m
-pod/etcd-devkub                      1/1     Running   1             19m
-pod/kube-apiserver-devkub            1/1     Running   1             19m
-pod/kube-controller-manager-devkub   1/1     Running   4 (19m ago)   19m
-pod/kube-proxy-52pm2                 1/1     Running   0             19m
-pod/kube-scheduler-devkub            1/1     Running   1             19m
-pod/storage-provisioner              1/1     Running   0             19m
-
-NAME               TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE
-service/kube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP,9153/TCP   19m
+user@vm1:~/.kube$ kubectl get services
+NAME         TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+hello-node   LoadBalancer   10.99.54.228   <pending>     8080:30329/TCP   68m
+kubernetes   ClusterIP      10.96.0.1      <none>        443/TCP          73m
 ```
 - установить аддоны ingress и dashboard
 ```
