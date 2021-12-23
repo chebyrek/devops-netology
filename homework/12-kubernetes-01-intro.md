@@ -98,6 +98,27 @@ CoreDNS is running at https://10.128.0.11:8443/api/v1/namespaces/kube-system/ser
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 ```
 - проверить работу приложения из задания 2, запустив port-forward до кластера
+```
+user@vm1:~/.kube$ curl http://devkub:30329
+CLIENT VALUES:
+client_address=172.17.0.1
+command=GET
+real path=/
+query=nil
+request_version=1.1
+request_uri=http://devkub:8080/
+
+SERVER VALUES:
+server_version=nginx: 1.10.0 - lua: 10001
+
+HEADERS RECEIVED:
+accept=*/*
+host=devkub:30329
+user-agent=curl/7.68.0
+BODY:
+-no body in request-
+```
+не уверен, что это тот вывод, который должно показывать приложение, но что есть.
 
 ## Задача 4 (*): собрать через ansible (необязательное)
 
