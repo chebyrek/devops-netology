@@ -118,8 +118,39 @@ user-agent=curl/7.68.0
 BODY:
 -no body in request-
 ```
-не уверен, что это тот вывод, который должно показывать приложение, но что есть.
+Еще попробовал делать expose с типом `nodePort`, но такая же фигня, наружу выставляется случайный порт.  
+В чате посоветовали делать expose с типом ClusterIP и сделать port-Forward
+```
+$ kubectl expose deployment hello-node --port 8080
+service/hello-node exposed
+$ kubectl get service
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+hello-node   ClusterIP   10.104.169.65   <none>        8080/TCP   81s
+kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP    20h
+$ kubectl port-forward hello-node-7567d9fdc9-rmk4t 8080:8080
+Forwarding from 127.0.0.1:8080 -> 8080
+Forwarding from [::1]:8080 -> 8080
+Handling connection for 8080
+$ curl http://localhost:8080
+CLIENT VALUES:
+client_address=127.0.0.1
+command=GET
+real path=/
+query=nil
+request_version=1.1
+request_uri=http://localhost:8080/
 
+SERVER VALUES:
+server_version=nginx: 1.10.0 - lua: 10001
+
+HEADERS RECEIVED:
+accept=*/*
+host=localhost:8080
+user-agent=curl/7.68.0
+BODY:
+-no body in request-
+```
+Надеюсь что-то из этого правильно )
 ## Задача 4 (*): собрать через ansible (необязательное)
 
 Профессионалы не делают одну и ту же задачу два раза. Давайте закрепим полученные навыки, автоматизировав выполнение заданий  ansible-скриптами. При выполнении задания обратите внимание на доступные модули для k8s под ansible.
