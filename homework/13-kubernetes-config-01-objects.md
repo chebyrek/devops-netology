@@ -150,16 +150,117 @@ db:5432 - accepting connections
 * в окружении фронта прописан адрес сервиса бекенда;
 * в окружении бекенда прописан адрес сервиса базы данных.
 
-## Задание 3 (*): добавить endpoint на внешний ресурс api
-Приложению потребовалось внешнее api, и для его использования лучше добавить endpoint в кластер, направленный на это api. Требования:
-* добавлен endpoint до внешнего api (например, геокодер).
+front
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: front
+  name: front
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front
+  template:
+    metadata:
+      labels:
+        app: front
+    spec:
+      containers:
+        - image: quay.io/chebyrek/frontend13
+          imagePullPolicy: IfNotPresent
+          name: front
+          env:
+            - name: BASE_URL
+              value: "http://back:9000"
 
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: front
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+    - name: front
+      port: 80
+  selector:
+    app: front
 
-### Как оформить ДЗ?
-
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
-
-В качестве решения прикрепите к ДЗ конфиг файлы для деплоя. Прикрепите скриншоты вывода команды kubectl со списком запущенных объектов каждого типа (pods, deployments, statefulset, service) или скриншот из самого Kubernetes, что сервисы подняты и работают.
-
+```
+back
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: back
+  name: back
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: back
+  template:
+    metadata:
+      labels:
+        app: back
+    spec:
+      containers:
+        - image: quay.io/chebyrek/backend13
+          imagePullPolicy: IfNotPresent
+          name: back
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://postgres:postgres@db:5432/news"
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: back
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+    - name: back
+      port: 9000
+  selector:
+    app: back
+
+```
+```
+:::~/13/1$ k get svc
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+back         ClusterIP   10.233.37.222   <none>        9000/TCP       2m20s
+db           ClusterIP   10.233.39.235   <none>        5432/TCP       2m20s
+front        NodePort    10.233.51.163   <none>        80:30905/TCP   2m20s
+kubernetes   ClusterIP   10.233.0.1      <none>        443/TCP        3d15h
+:::~/13/1$ k get po
+NAME                           READY   STATUS        RESTARTS      AGE
+back-7b4bc5c8b6-tkqn6          1/1     Running       0             2m54s
+front-6c86b646b8-f7rtc         1/1     Running       0             2m54s
+hello-node1-7c6b57dfd4-8zgg8   1/1     Terminating   0             3d14h
+nm1-6b6bb949c6-lkph5           1/1     Running       2 (65m ago)   37h
+postgres-0                     1/1     Running       0             2m54s
+```
+```
+:::~/13/1$ k exec front-6c86b646b8-f7rtc -- curl back:9000
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    22  100    22    0     0    785      0 --:--:-- --:--:-- --:--:--   785{"detail":"Not Found"}
+```
+```
+:::~/13/1$ k exec back-7b4bc5c8b6-tkqn6 -- curl db:5432
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+curl: (52) Empty reply from server
+command terminated with exit code 52
+```
+
+Я пробовал запускать приложение из dockercompose, там оно у меня тоже не заработало, на 9000 порту отдает `{"detail":"Not Found"}`, видимо не может с базой связаться, хотя она доступна, разбираться нет времени. 
