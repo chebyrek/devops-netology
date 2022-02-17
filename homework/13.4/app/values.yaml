@@ -1,0 +1,18 @@
+replicaCount: 1
+
+namespace: netology
+
+image:
+  repository: quay.io/chebyrek/frontend13
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+appPort: 80
